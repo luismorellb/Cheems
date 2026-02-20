@@ -1,6 +1,11 @@
 ﻿package mx.itson.cheems
 
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
@@ -14,7 +19,7 @@ import androidx.core.view.WindowInsetsCompat
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     var gameOverCard = 0
-    var safeCardsRevealed = 0
+    var cheemsGoodRevealed = 0
     var gameFinished = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +35,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
     fun start(){
 
-        safeCardsRevealed = 0
+        cheemsGoodRevealed = 0
         gameFinished = false
 
         for (i in 1..9) {
@@ -64,6 +69,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         btnCard.tag = "flipped"
 
         if (card == gameOverCard){
+
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // Si la versión del sistema operativo viene instalado en el teléfono es igual o mayor a Android 12
+                val vibratorAdmin = applicationContext.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                val vibrator = vibratorAdmin.defaultVibrator
+                vibrator.vibrate(VibrationEffect.createOneShot(1500, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                val vibrator = applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                vibrator.vibrate(1500)
+            }
+
             Toast.makeText(this,
                 "¡Haz perdido, intenta de nuevo!",
                 Toast.LENGTH_LONG).show()
@@ -81,9 +97,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
         } else {
             btnCard.setBackgroundResource(R.drawable.cheems_ok)
-            safeCardsRevealed++
+            cheemsGoodRevealed++
 
-            if (safeCardsRevealed == 8){
+            if (cheemsGoodRevealed == 8){
                 gameFinished = true
 
                 Toast.makeText(this,
