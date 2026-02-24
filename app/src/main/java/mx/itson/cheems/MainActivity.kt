@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     var gameOverCard = 0
     var cheemsGoodRevealed = 0
+    var cheemsMasterRevealed = 0
     var gameFinished = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,9 +37,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     fun start(){
 
         cheemsGoodRevealed = 0
+        cheemsMasterRevealed = 0
         gameFinished = false
 
-        for (i in 1..9) {
+        for (i in 1..12) {
             val btnCard = findViewById<View>(
                 resources.getIdentifier("card$i" , "id", this.packageName)
 
@@ -52,11 +54,23 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             btnStart.setOnClickListener(this)
         }
 
-        gameOverCard = (1..9).random()
+        gameOverCard = (1..12).random()
 
-        Log.d("Valor de la carta perdedora", "La cara perdedora es ${gameOverCard.toString()}")
+        Log.d("Valor de la carta perdedora", "La carta perdedora es ${gameOverCard.toString()}")
+        Log.d("Valor de la carta Master", "La carta Master es ${cheemsMasterRevealed.toString()}")
     }
 
+    fun vibratePhone(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Si la versión del sistema operativo viene instalado en el teléfono es igual o mayor a Android 12
+            val vibratorAdmin = applicationContext.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            val vibrator = vibratorAdmin.defaultVibrator
+            vibrator.vibrate(VibrationEffect.createOneShot(1500, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            val vibrator = applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            vibrator.vibrate(1500)
+        }
+    }
     fun flip(card :Int){
 
         if (gameFinished) return
@@ -70,27 +84,25 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         if (card == gameOverCard){
 
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                // Si la versión del sistema operativo viene instalado en el teléfono es igual o mayor a Android 12
-                val vibratorAdmin = applicationContext.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-                val vibrator = vibratorAdmin.defaultVibrator
-                vibrator.vibrate(VibrationEffect.createOneShot(1500, VibrationEffect.DEFAULT_AMPLITUDE))
-            } else {
-                val vibrator = applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                vibrator.vibrate(1500)
-            }
+            vibratePhone()
+
+            if (card == cheemsGoodRevealed){
+
+                vibratePhone()
 
             Toast.makeText(this,
                 "¡Haz perdido, intenta de nuevo!",
                 Toast.LENGTH_LONG).show()
 
-            for(i in 1..9){
+            for(i in 1..12){
                 val btnCard = findViewById<View>(
                     resources.getIdentifier("card$i", "id", this.packageName)
                 ) as ImageButton
 
                 if (i == card){
                     btnCard.setBackgroundResource(R.drawable.cheems_bad)
+                } else if (i == cheemsMasterRevealed){
+                    btnCard.setBackgroundResource(R.drawable.cheems_master)
                 } else {
                     btnCard.setBackgroundResource(R.drawable.cheems_ok)
                 }
@@ -99,12 +111,23 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             btnCard.setBackgroundResource(R.drawable.cheems_ok)
             cheemsGoodRevealed++
 
-            if (cheemsGoodRevealed == 8){
+            btnCard.setBackgroundResource(R.drawable.cheems_master)
+            cheemsMasterRevealed++
+
+            if (cheemsGoodRevealed == 11){
                 gameFinished = true
 
                 Toast.makeText(this,
                     "¡Haz ganado!",
                     Toast.LENGTH_LONG).show()
+            } else if {
+                cheemsMasterRevealed == 1
+                gameFinished = true
+
+                    Toast.makeText(this,
+                        "¡Ganaste por Comodín!",
+                        Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
@@ -120,6 +143,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             R.id.card7 -> { flip(7)}
             R.id.card8 -> { flip(8)}
             R.id.card9 -> { flip(9)}
+            R.id.card10 -> { flip(10)}
+            R.id.card11 -> { flip(11)}
+            R.id.card12 -> { flip(12)}
             R.id.reset -> start()
         }
     }
