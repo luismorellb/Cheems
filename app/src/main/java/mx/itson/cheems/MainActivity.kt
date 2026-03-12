@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     var gameOverCard = 0
     var cheemsMasterRevealed = 0
     var cardCount = 0
+    var btnNewWinner = false
     var gameFinished = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,12 +43,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         val btnNewWinner = findViewById<View>(R.id.btn_new_winner) as Button
         btnNewWinner.setOnClickListener(this)
+        btnNewWinner.visibility = View.GONE
         start()
         Toast.makeText(this, "Bienvenido pa", Toast.LENGTH_LONG).show()
     }
     fun start(){
 
         cardCount = 0
+        btnNewWinner = false
         gameFinished = false
 
         for (i in 1..12) {

@@ -35,7 +35,7 @@ class WinnerFormActivity : AppCompatActivity(), View.OnClickListener {
                 val result = Winner().save(this, name, nickname)
 
                 if (result) {
-                    Toast.makeText(this, "¡Ganador registrado!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Ganador registrado", Toast.LENGTH_LONG).show()
                 } else {
                     Toast.makeText(this, "No se ha podido registrar al ganador", Toast.LENGTH_LONG).show()
                 }
