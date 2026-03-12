@@ -1,6 +1,7 @@
 ﻿package mx.itson.cheems
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
@@ -8,6 +9,7 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -15,13 +17,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import mx.itson.cheems.entities.Winner
+import mx.itson.cheems.WinnerFormActivity
 
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     var gameOverCard = 0
-    var cheemsGoodRevealed = 0
     var cheemsMasterRevealed = 0
+    var cardCount = 0
     var gameFinished = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,15 +37,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             insets
         }
 
-        Winner().save(this, "Pedro Robles Martínez", "pedrin")
-        Winner().getAll(this)
+        //Winner().save(this, "Pedro Robles Martínez", "pedrin")
+        //Winner().getAll(this)
 
+        val btnNewWinner = findViewById<View>(R.id.btn_new_winner) as Button
+        btnNewWinner.setOnClickListener(this)
         start()
+        Toast.makeText(this, "Bienvenido pa", Toast.LENGTH_LONG).show()
     }
     fun start(){
 
-        cheemsGoodRevealed = 0
-        cheemsMasterRevealed = 0
+        cardCount = 0
         gameFinished = false
 
         for (i in 1..12) {
@@ -50,15 +55,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 resources.getIdentifier("card$i" , "id", this.packageName)
 
             ) as ImageButton
+            btnCard.isEnabled=true
             btnCard.setOnClickListener(this)
             btnCard.setBackgroundResource(R.drawable.cheems_question)
-
-            btnCard.tag = null
 
             val btnStart = findViewById<View>(R.id.reset)
             btnStart.setOnClickListener(this)
         }
-
+        cheemsMasterRevealed = (1..12).random()
         gameOverCard = (1..12).random()
 
         Log.d("Valor de la carta perdedora", "La carta perdedora es ${gameOverCard.toString()}")
@@ -77,63 +81,53 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
     fun flip(card :Int){
-
         if (gameFinished) return
 
         val btnCard = findViewById<View>(
             resources.getIdentifier("card$card", "id", this.packageName)
         ) as ImageButton
 
-        if (btnCard.tag == "flipped") return
-        btnCard.tag = "flipped"
-
-        if (card == gameOverCard){
-
+        if (card == cheemsMasterRevealed) {
+            gameFinished = true
             vibratePhone()
+            Toast.makeText(this, "¡Haz encontrado al Cheems Master! Ganaste", Toast.LENGTH_LONG).show()
+            revealAllCards()
+        }
+        else if (card == gameOverCard) {
+            gameFinished = true
+            vibratePhone()
+            Toast.makeText(this, "¡Perdiste, intenta otra vez!", Toast.LENGTH_LONG).show()
 
-            if (card == cheemsGoodRevealed){
-
-                vibratePhone()
-
-            Toast.makeText(this,
-                "¡Haz perdido, intenta de nuevo!",
-                Toast.LENGTH_LONG).show()
-
-            for(i in 1..12){
-                val btnCard = findViewById<View>(
-                    resources.getIdentifier("card$i", "id", this.packageName)
-                ) as ImageButton
-
-                if (i == card){
-                    btnCard.setBackgroundResource(R.drawable.cheems_bad)
-                } else if (i == cheemsMasterRevealed){
-                    btnCard.setBackgroundResource(R.drawable.cheems_master)
-                } else {
-                    btnCard.setBackgroundResource(R.drawable.cheems_ok)
-                }
-            }
-        } else {
+            revealAllCards()
+        }
+        else {
             btnCard.setBackgroundResource(R.drawable.cheems_ok)
-            cheemsGoodRevealed++
+            btnCard.isEnabled = false
+            cardCount++
 
-            btnCard.setBackgroundResource(R.drawable.cheems_master)
-            cheemsMasterRevealed++
-
-            if (cheemsGoodRevealed == 11){
+            if (cardCount >=10) {
                 gameFinished = true
+                vibratePhone()
+                Toast.makeText(this, "¡Haz ganado!", Toast.LENGTH_LONG).show()
 
-                Toast.makeText(this,
-                    "¡Haz ganado!",
-                    Toast.LENGTH_LONG).show()
-            } else if (cheemsMasterRevealed == 1){
-                gameFinished = true
-
-                    Toast.makeText(this,
-                        "¡Ganaste por Comodín!",
-                        Toast.LENGTH_LONG).show()
-                }
+                revealAllCards()
             }
         }
+    }
+    fun revealAllCards() {
+        for (i in 1..12) {
+            val btn = findViewById<View>(
+                resources.getIdentifier("card$i", "id", this.packageName)
+            ) as ImageButton
+            btn.isEnabled = false
+
+            when (i) {
+                cheemsMasterRevealed -> btn.setBackgroundResource(R.drawable.cheems_master)
+                gameOverCard -> btn.setBackgroundResource(R.drawable.cheems_bad)
+                else -> btn.setBackgroundResource(R.drawable.cheems_ok)
+            }
+        }
+
     }
 
     override fun onClick(v: View) {
@@ -151,6 +145,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             R.id.card11 -> { flip(11)}
             R.id.card12 -> { flip(12)}
             R.id.reset -> start()
+            R.id.btn_new_winner -> {
+                val intentWinnerForm = Intent(this, WinnerFormActivity::class.java)
+                startActivity(intentWinnerForm)
+            }
         }
     }
 }

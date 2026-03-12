@@ -21,7 +21,7 @@ class Winner {
         this.nickname = nickname
     }
 
-    fun save(context: Context, name: String, nickname: String){
+    fun save(context: Context, name: String, nickname: String): Boolean{
         try {
             val cheemsDB = CheemsDB(context,
                 "CheemsDB",

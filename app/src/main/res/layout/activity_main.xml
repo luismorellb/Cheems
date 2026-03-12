@@ -32,9 +32,7 @@
             android:layout_height="130dip"
             android:layout_weight="1"/>
 
-
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -61,7 +59,6 @@
 
 
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -113,10 +110,22 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/reset"
+            android:layout_width="match_parent"
+            android:layout_height="70dip"
+            android:text="Restart"/>
+    </LinearLayout>
+
     <Button
-        android:id="@+id/reset"
+        android:id="@+id/btn_new_winner"
         android:layout_width="match_parent"
         android:layout_height="70dip"
-        android:text="REINICIAR JUEGO" />
+        android:text="Registrar ganador"/>
 
 </LinearLayout>
